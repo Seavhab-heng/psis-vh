@@ -3,20 +3,551 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Professional Website</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="theme-color" content="#007bff">
+    <meta name="description" content="Real-time camera capture and batch image watermarking">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23007bff' width='192' height='192'/><text x='96' y='110' font-size='80' font-weight='bold' text-anchor='middle' fill='white'>💧</text></svg>">
+    <title>Mobile Camera Watermark</title>
     <style>
-        body { font-family: sans-serif; line-height: 1.6; margin: 0; padding: 20px; }
-        header { background: #333; color: #fff; padding: 1rem; text-align: center; }
-        main { max-width: 800px; margin: auto; padding: 20px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        html, body {
+            width: 100%;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            background: #000;
+            overflow: hidden;
+        }
+        
+        /* Force landscape 1920x1080 */
+        body {
+            width: 1920px;
+            height: 1080px;
+        }
+        
+        .container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            gap: 10px;
+            padding: 10px;
+        }
+
+        .tab-buttons {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 20;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            background: #444;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .tab-btn.active {
+            background: #007bff;
+        }
+
+        .tab-content {
+            display: none;
+            width: 100%;
+            height: 100%;
+            flex-direction: column;
+        }
+
+        .tab-content.active {
+            display: flex;
+        }
+
+        /* Camera Tab */
+        .video-container {
+            width: 100%;
+            height: 100%;
+            background: #222;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        button {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 30px;
+            font-size: 18px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #status {
+            position: absolute;
+            top: 60px;
+            left: 10px;
+            color: #fff;
+            background: rgba(0,0,0,0.7);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            z-index: 10;
+        }
+
+        .error {
+            color: #ff6b6b;
+        }
+
+        .success {
+            color: #51cf66;
+        }
+
+        /* Upload Tab */
+        .upload-container {
+            width: 100%;
+            height: 100%;
+            background: #1a1a1a;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .upload-area {
+            border: 2px dashed #007bff;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 20px;
+            background: rgba(0, 123, 255, 0.1);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .upload-area.dragover {
+            background: rgba(0, 123, 255, 0.3);
+            border-color: #0056b3;
+        }
+
+        .upload-area p {
+            color: #fff;
+            margin: 10px 0;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .images-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .image-item {
+            position: relative;
+            background: #333;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .image-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-status {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            font-size: 12px;
+            padding: 5px;
+            text-align: center;
+        }
+
+        .processing {
+            color: #ffb700;
+        }
+
+        .done {
+            color: #51cf66;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-shrink: 0;
+        }
+
+        .controls button {
+            position: static;
+            transform: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            flex: 1;
+        }
+
+        .progress-info {
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Welcome to My Website</h1>
-    </header>
-    <main>
-        <h2>About Me</h2>
-        <p>This is a starter template for your new website project.</p>
-    </main>
+
+    <div class="tab-buttons">
+        <button class="tab-btn active" onclick="switchTab('camera')">📷 Camera</button>
+        <button class="tab-btn" onclick="switchTab('upload')">📁 Upload & Edit</button>
+    </div>
+
+    <!-- Camera Tab -->
+    <div id="camera" class="tab-content active">
+        <div id="status" class="error">Initializing camera...</div>
+
+        <div class="video-container">
+            <video id="video" autoplay playsinline muted></video>
+        </div>
+        
+        <button id="snap">Snap Photo (1920×1080)</button>
+    </div>
+
+    <!-- Upload Tab -->
+    <div id="upload" class="tab-content">
+        <div class="upload-container">
+            <div class="progress-info">Upload up to 500 images - Watermark applied automatically</div>
+            
+            <div class="upload-area" onclick="document.getElementById('fileInput').click()" id="uploadArea">
+                <p>📤 Drag & drop images here or click to select</p>
+                <p style="font-size: 12px; color: #aaa;">PNG, JPG, JPEG • Max 500 files</p>
+            </div>
+
+            <input type="file" id="fileInput" multiple accept="image/png,image/jpeg,image/jpg" />
+
+            <div id="progressInfo" style="color: #fff; margin-bottom: 10px;"></div>
+            <div class="images-grid" id="imagesGrid"></div>
+
+            <div class="controls">
+                <button onclick="downloadAllOriginals()" id="btnDownloadOrig">💾 Download Originals</button>
+                <button onclick="downloadAllWatermarked()" id="btnDownloadWater">💧 Download Watermarked</button>
+                <button onclick="clearAll()" id="btnClear">🗑️ Clear All</button>
+            </div>
+        </div>
+    </div>
+    
+    <canvas id="canvas" style="display:none;"></canvas>
+
+    <script>
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tab).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (tab === 'camera') {
+                video.play().catch(() => {});
+            }
+        }
+
+        // ========== CAMERA FUNCTIONALITY ==========
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const statusDiv = document.getElementById('status');
+        const snapBtn = document.getElementById('snap');
+
+        // Set canvas to 1920x1080
+        canvas.width = 1920;
+        canvas.height = 1080;
+
+        // Access rear camera
+        navigator.mediaDevices.getUserMedia({ 
+            video: { 
+                facingMode: 'environment', 
+                width: { ideal: 1920 }, 
+                height: { ideal: 1080 } 
+            },
+            audio: false
+        })
+        .then(stream => {
+            console.log('✓ Camera stream acquired');
+            video.srcObject = stream;
+            
+            // Wait for video to load
+            video.onloadedmetadata = () => {
+                console.log(`✓ Video loaded: ${video.videoWidth}x${video.videoHeight}`);
+                statusDiv.textContent = `Ready - ${video.videoWidth}x${video.videoHeight}`;
+                statusDiv.className = 'success';
+                snapBtn.disabled = false;
+            };
+        })
+        .catch(error => {
+            console.error('Camera error:', error);
+            statusDiv.textContent = `Camera Error: ${error.message}`;
+            statusDiv.className = 'error';
+            snapBtn.disabled = true;
+        });
+
+        snapBtn.addEventListener('click', async () => {
+            try {
+                // Clear canvas
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, 1920, 1080);
+                
+                // Draw video frame
+                ctx.drawImage(video, 0, 0, 1920, 1080);
+                
+                // Add Watermark text
+                ctx.font = "60px Arial";
+                ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+                ctx.fillText("MY WATERMARK", 50, 1030);
+
+                // Convert canvas to blob
+                canvas.toBlob(async (blob) => {
+                    const filename = `watermark-${Date.now()}.jpg`;
+                    
+                    // Try native share API (saves directly to mobile gallery)
+                    if (navigator.share) {
+                        try {
+                            await navigator.share({
+                                files: [new File([blob], filename, { type: 'image/jpeg' })],
+                                title: 'Watermarked Photo'
+                            });
+                            console.log('✓ Photo shared to mobile gallery');
+                            statusDiv.textContent = 'Photo saved to gallery!';
+                            statusDiv.className = 'success';
+                        } catch (err) {
+                            console.log('Share cancelled or failed, using download');
+                            downloadPhoto(blob, filename);
+                        }
+                    } else {
+                        // Fallback: regular download
+                        downloadPhoto(blob, filename);
+                    }
+                    
+                    setTimeout(() => {
+                        statusDiv.textContent = 'Ready - ' + (video.videoWidth || 1920) + 'x' + (video.videoHeight || 1080);
+                    }, 2000);
+                }, 'image/jpeg', 0.95);
+            } catch (err) {
+                console.error('Capture error:', err);
+                statusDiv.textContent = `Error: ${err.message}`;
+                statusDiv.className = 'error';
+            }
+        });
+
+        function downloadPhoto(blob, filename) {
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.href = url;
+            link.download = filename;
+            link.click();
+            URL.revokeObjectURL(url);
+            console.log('✓ Photo downloaded');
+            statusDiv.textContent = 'Photo saved!';
+            statusDiv.className = 'success';
+        }
+
+        // ========== UPLOAD & BATCH WATERMARK FUNCTIONALITY ==========
+        let uploadedImages = [];
+        const MAX_FILES = 500;
+
+        const fileInput = document.getElementById('fileInput');
+        const uploadArea = document.getElementById('uploadArea');
+        const imagesGrid = document.getElementById('imagesGrid');
+        const progressInfo = document.getElementById('progressInfo');
+
+        // Drag & drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        function handleFiles(files) {
+            const newFiles = Array.from(files).slice(0, MAX_FILES - uploadedImages.length);
+            
+            progressInfo.textContent = `Processing ${newFiles.length} images...`;
+
+            newFiles.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const imgData = {
+                        name: file.name,
+                        original: e.target.result,
+                        watermarked: null,
+                        status: 'processing'
+                    };
+                    uploadedImages.push(imgData);
+                    applyWatermark(uploadedImages.length - 1);
+                    renderImage(uploadedImages.length - 1);
+                };
+                reader.readAsDataURL(file);
+            });
+
+            updateProgress();
+        }
+
+        function applyWatermark(index) {
+            const imgData = uploadedImages[index];
+            const img = new Image();
+            img.onload = () => {
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = img.width;
+                tempCanvas.height = img.height;
+                const tempCtx = tempCanvas.getContext('2d');
+
+                // Draw original image
+                tempCtx.drawImage(img, 0, 0);
+
+                // Add watermark
+                tempCtx.font = "60px Arial";
+                tempCtx.fillStyle = "rgba(255, 255, 255, 0.7)";
+                tempCtx.fillText("MY WATERMARK", 50, img.height - 30);
+
+                // Save watermarked version
+                imgData.watermarked = tempCanvas.toDataURL('image/jpeg', 0.95);
+                imgData.status = 'done';
+                renderImage(index);
+                updateProgress();
+            };
+            img.src = imgData.original;
+        }
+
+        function renderImage(index) {
+            const imgData = uploadedImages[index];
+            let item = document.getElementById(`img-${index}`);
+
+            if (!item) {
+                item = document.createElement('div');
+                item.id = `img-${index}`;
+                item.className = 'image-item';
+                imagesGrid.appendChild(item);
+            }
+
+            item.innerHTML = `
+                <img src="${imgData.original}" alt="${imgData.name}">
+                <div class="image-status ${imgData.status}">
+                    ${imgData.status === 'processing' ? '⏳ Processing...' : '✓ Done'}
+                </div>
+            `;
+        }
+
+        function updateProgress() {
+            const total = uploadedImages.length;
+            const done = uploadedImages.filter(img => img.status === 'done').length;
+            progressInfo.textContent = `Images: ${total}/${MAX_FILES} | Done: ${done}/${total}`;
+        }
+
+        function downloadAllOriginals() {
+            if (uploadedImages.length === 0) {
+                alert('No images uploaded');
+                return;
+            }
+            uploadedImages.forEach((imgData, index) => {
+                setTimeout(() => {
+                    downloadImage(imgData.original, `original-${index}-${imgData.name}`);
+                }, index * 200);
+            });
+        }
+
+        function downloadAllWatermarked() {
+            if (uploadedImages.length === 0) {
+                alert('No images uploaded');
+                return;
+            }
+            uploadedImages.forEach((imgData, index) => {
+                setTimeout(() => {
+                    downloadImage(imgData.watermarked, `watermarked-${index}-${imgData.name}`);
+                }, index * 200);
+            });
+        }
+
+        function downloadImage(dataUrl, filename) {
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            link.download = filename;
+            link.click();
+        }
+
+        function clearAll() {
+            if (confirm('Clear all images?')) {
+                uploadedImages = [];
+                imagesGrid.innerHTML = '';
+                fileInput.value = '';
+                progressInfo.textContent = '';
+            }
+        }
+
+        // ========== PWA SERVICE WORKER REGISTRATION ==========
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then((reg) => {
+                    console.log('✓ Service Worker registered:', reg.scope);
+                })
+                .catch((err) => {
+                    console.warn('Service Worker registration failed:', err);
+                });
+        }
+
+        // Detect PWA installation
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            let deferredPrompt = e;
+            console.log('✓ App installable - "Add to Home Screen" available');
+        });
+
+        window.addEventListener('appinstalled', () => {
+            console.log('✓ PWA installed to home screen');
+        });
+    </script>
 </body>
 </html>

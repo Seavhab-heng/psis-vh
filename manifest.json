@@ -1,0 +1,68 @@
+{
+  "name": "Mobile Camera Watermark",
+  "short_name": "Watermark",
+  "description": "Real-time camera capture and batch image watermarking application",
+  "start_url": "/",
+  "scope": "/",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#000000",
+  "theme_color": "#007bff",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23007bff' width='192' height='192'/><text x='96' y='110' font-size='80' font-weight='bold' text-anchor='middle' fill='white' font-family='Arial'>💧</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%23007bff' width='512' height='512'/><text x='256' y='360' font-size='280' text-anchor='middle' fill='white'>💧</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "utilities"],
+  "screenshots": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 540 720'><rect fill='%23222' width='540' height='720'/><text x='270' y='360' font-size='120' text-anchor='middle' fill='%23fff' font-family='Arial'>📷</text></svg>",
+      "sizes": "540x720",
+      "type": "image/svg+xml",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1280 720'><rect fill='%23222' width='1280' height='720'/><text x='640' y='360' font-size='200' text-anchor='middle' fill='%23fff' font-family='Arial'>📷💧</text></svg>",
+      "sizes": "1280x720",
+      "type": "image/svg+xml",
+      "form_factor": "wide"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Camera",
+      "short_name": "Camera",
+      "description": "Take photos with watermark",
+      "url": "/?tab=camera",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><rect fill='%23007bff' width='96' height='96'/><text x='48' y='65' font-size='48' text-anchor='middle' fill='white'>📷</text></svg>",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "Batch Upload",
+      "short_name": "Upload",
+      "description": "Upload and watermark multiple images",
+      "url": "/?tab=upload",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><rect fill='%23007bff' width='96' height='96'/><text x='48' y='65' font-size='48' text-anchor='middle' fill='white'>📤</text></svg>",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+      ]
+    }
+  ]
+}
