@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XAU.NEWS | Gold Market Intelligence</title>
+    <style>
+        :root {
+            --bg-dark: #090d16;
+            --bg-card: #131a26;
+            --border-color: #222f43;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --gold: #e2b047;
+            --gold-hover: #f5cc68;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.5;
+            padding-bottom: 60px;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        /* Top Header Navigation */
+        header {
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px 5%;
+            background-color: rgba(9, 13, 22, 0.9);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 900;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .logo span {
+            color: var(--gold);
+        }
+
+        .ticker-badge {
+            background: rgba(226, 176, 71, 0.1);
+            border: 1px solid var(--gold);
+            padding: 6px 16px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--gold);
+            letter-spacing: 0.05em;
+        }
+
+        /* Main Workspace Container */
+        main {
+            max-width: 1300px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .section-hdr {
+            font-size: 1.25rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 24px;
+            font-weight: 800;
+            color: var(--gold);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        /* Hero Article Layout */
+        .hero-wrapper {
+            margin-bottom: 50px;
+        }
+
+        .hero-article {
+            background: linear-gradient(145deg, #131a26 0%, #0d131d 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1.1fr 1fr;
+            box-shadow: 0 20px 40px -15px rgba(0,0,0,0.7);
+        }
+
+        .hero-graphic {
+            background: linear-gradient(135deg, #1e293b 0%, #090d16 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            min-height: 320px;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .hero-graphic::after {
+            content: "GOLD / XAU";
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: rgba(255, 255, 255, 0.02);
+            letter-spacing: 6px;
+        }
+
+        .live-tag {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: #ef4444;
+            color: #fff;
+            padding: 4px 10px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            border-radius: 3px;
+            letter-spacing: 0.05em;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        .hero-body {
+            padding: 45px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .meta-group {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .source-pill {
+            color: var(--gold);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .hero-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            line-height: 1.25;
+            margin-bottom: 24px;
+            letter-spacing: -0.02em;
+        }
+
+        .hero-title a:hover, .card-title a:hover {
+            color: var(--gold-hover);
+        }
+
+        /* 3-Column Grid View */
+        .feed-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 24px;
+        }
+
+        .news-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+
+        .news-card:hover {
+            border-color: var(--gold);
+            transform: translateY(-2px);
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            line-height: 1.45;
+            margin-bottom: 20px;
+        }
+
+        .card-bottom {
+            margin-top: auto;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .action-link {
+            font-weight: 700;
+            color: var(--text-primary);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .action-link:hover {
+            color: var(--gold);
+        }
+
+        /* Global States */
+        .state-msg {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* Responsive Media Adjustments */
+        @media (max-width: 900px) {
+            .hero-article {
+                grid-template-columns: 1fr;
+            }
+            .hero-graphic {
+                min-height: 160px;
+            }
+            .hero-body {
+                padding: 24px;
+            }
+            .hero-title {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">XAU<span>.NEWS</span></div>
+        <div class="ticker-badge">LIVE GOLD PORTAL</div>
+    </header>
+
+    <main id="app-container">
+        <div id="loader" class="state-msg">Loading current gold metrics & live newsfeed...</div>
+        
+        <div id="dashboard-view" style="display: none;">
+            <div class="hero-wrapper">
+                <h2 class="section-hdr">Top Intelligence</h2>
+                <div id="hero-mount"></div>
+            </div>
+
+            <div>
+                <h2 class="section-hdr">Market Roll</h2>
+                <div class="feed-grid" id="grid-mount"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // UX Data Processor
+        function processFeedItem(item) {
+            let titleText = item.title || "";
+            let publisher = "Market News";
+            let directUrl = "#";
+
+            // Parse news source publisher out of titles formatted like "Title - Source"
+            if (titleText.includes(" - ")) {
+                const pieces = titleText.split(" - ");
+                publisher = pieces.pop();
+                titleText = pieces.join(" - ");
+            }
+
+            // Extract the target tracking clean link out of instructions
+            if (item.article && item.article.includes("https://")) {
+                directUrl = item.article.split("https://")[1];
+                directUrl = "https://" + directUrl;
+            }
+
+            // Humanize timestamp display string conversion
+            const dt = new Date(item.timeframe);
+            const formattedTime = isNaN(dt.getTime()) ? "Just Now" : dt.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            return { titleText, publisher, directUrl, formattedTime };
+        }
+
+        // Network Engine to contact endpoint resource
+        async function fetchGoldNews() {
+            try {
+                const response = await fetch('/gold_news.json');
+                if (!response.ok) throw new Error('Network visibility error');
+                
+                const data = await response.json();
+                renderUI(data);
+            } catch (err) {
+                console.error("Error retrieving data, using fallback visualization: ", err);
+                document.getElementById('loader').innerHTML = `
+                    <p style="color: #ef4444; margin-bottom: 10px;">Unable to pull live feed due to CORS restrictions or network route blockages.</p>
+                    <small style="color: var(--text-secondary)">Verify file runtime environments, or inspect standard server headers configurations.</small>
+                `;
+            }
+        }
+
+        // UI Compilation & Rendering Component
+        function renderUI(articles) {
+            if (!articles || articles.length === 0) {
+                document.getElementById('loader').innerText = "No updates available at this moment.";
+                return;
+            }
+
+            const heroMount = document.getElementById('hero-mount');
+            const gridMount = document.getElementById('grid-mount');
+
+            // 1. Compile Top Story (Hero View Element)
+            const topStory = processFeedItem(articles[0]);
+            heroMount.innerHTML = `
+                <div class="hero-article">
+                    <div class="hero-graphic">
+                        <span class="live-tag">Live Report</span>
+                    </div>
+                    <div class="hero-body">
+                        <div class="meta-group">
+                            <span class="source-pill">${topStory.publisher}</span>
+                            <span>•</span>
+                            <span>${topStory.formattedTime}</span>
+                        </div>
+                        <h3 class="hero-title">
+                            <a href="${topStory.directUrl}" target="_blank">${topStory.titleText}</a>
+                        </h3>
+                        <div>
+                            <a href="${topStory.directUrl}" target="_blank" class="action-link">Open Full Analysis &rarr;</a>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // 2. Compile Feed Items (Secondary Grid Layout Loop)
+            let remainingGridHtml = "";
+            for (let i = 1; i < articles.length; i++) {
+                const item = processFeedItem(articles[i]);
+                remainingGridHtml += `
+                    <div class="news-card">
+                        <div>
+                            <div class="meta-group" style="margin-bottom: 12px;">
+                                <span class="source-pill">${item.publisher}</span>
+                            </div>
+                            <h4 class="card-title">
+                                <a href="${item.directUrl}" target="_blank">${item.titleText}</a>
+                            </h4>
+                        </div>
+                        <div class="card-bottom">
+                            <span>${item.formattedTime}</span>
+                            <a href="${item.directUrl}" target="_blank" class="action-link">View &rarr;</a>
+                        </div>
+                    </div>
+                `;
+            }
+            gridMount.innerHTML = remainingGridHtml;
+
+            // Toggle Layout Visibility States
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('dashboard-view').style.display = 'block';
+        }
+
+        // Initialize execution on content load complete
+        document.addEventListener('DOMContentLoaded', fetchGoldNews);
+    </script>
+</body>
+</html>
